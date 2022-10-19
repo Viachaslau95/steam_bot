@@ -7,12 +7,12 @@ options = webdriver.ChromeOptions()
 options.add_argument(
     "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
 )
-options.add_extension('/home/yaroslav/projects/steam_bot/steam_bot/chromedriver/helper.crx')
+options.add_extension('/home/yaroslav/projects/steam_bot/steam_bot/easy_money/chromedriver/helper.crx')
 
 class SteamBot(object):
     def __init__(self):
         self.driver = webdriver.Chrome(
-                executable_path="../chromedriver/chromedriver",
+                executable_path="/home/yaroslav/projects/steam_bot/steam_bot/easy_money/chromedriver/chromedriver",
                 options=options
         )
 
@@ -171,6 +171,7 @@ class SteamBot(object):
             except Exception:
                 print('Some Error')
                 time.sleep(15)
+
 
 if __name__ == '__main__':
     bot = SteamBot()
