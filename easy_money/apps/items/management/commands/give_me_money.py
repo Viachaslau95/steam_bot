@@ -1,11 +1,13 @@
 import datetime
 import time
 
+import telebot
 from django.core.management.base import BaseCommand, CommandError
 from selenium import webdriver
 
 from apps.items import utils
 from apps.items.models import Item
+from apps.items.utils import token
 
 options = webdriver.ChromeOptions()
 options.add_argument(
@@ -19,36 +21,42 @@ driver = webdriver.Chrome(
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        bot = telebot.TeleBot(token)
         driver.get(utils.login_url)
         time.sleep(20)
-        while True:
-            for item in Item.objects.filter(is_active=True):
-                try:
-                    driver.get(item.link)
-                    for ind, element in enumerate(
-                            driver.find_element_by_id('searchResultsRows').find_elements_by_class_name(
-                                'market_listing_row')[:5]
-                    ):
-                        if element.find_elements_by_class_name('sih-fraud'):
-                            driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
-                            print('try buy')
-                            driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
-                            driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                            print('Purchased item with name_tag')
 
-                    for ind, element in enumerate(driver.find_elements_by_xpath('//div[@class="sih-images"]')[:3]):
-                        price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
-                        count_elements = len(element.find_elements_by_class_name('sticker-image'))
-                        if count_elements == 4 and float(price) <= item.price_4 or\
-                                count_elements == 3 and float(price) <= item.price_3:
-                            driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
-                            print('try buy')
-                            driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
-                            driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                            print('Purchased item with 4 or 3 stickers')
+        @bot.message_handler(commands=['start'])
+        def send_text_name_tag(message):
+            while True:
+                for item in Item.objects.filter(is_active=True):
+                    try:
+                        driver.get(item.link)
+                        for ind, element in enumerate(
+                                driver.find_element_by_id('searchResultsRows').find_elements_by_class_name(
+                                    'market_listing_row')[:5]
+                        ):
+                            if element.find_elements_by_class_name('sih-fraud'):
+                                driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
+                                print('try buy')
+                                driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
+                                driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
+                                bot.send_message(message.chat.id, f"You bought {item.title} with a name tag")
 
-                    time.sleep(5)
-                except Exception:
-                    time_now = datetime.datetime.now()
-                    print(f"Page refresh error: {time_now}")
-                    time.sleep(10)
+                        for ind, element in enumerate(driver.find_elements_by_xpath('//div[@class="sih-images"]')[:3]):
+                            price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
+                            count_elements = len(element.find_elements_by_class_name('sticker-image'))
+                            if count_elements == 4 and float(price) <= item.price_4 or\
+                                    count_elements == 3 and float(price) <= item.price_3:
+                                driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
+                                print('try buy')
+                                driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
+                                driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
+                                bot.send_message(message.chat.id, f"You bought {item.title} with 4 or 3 stickers")
+                        time.sleep(5)
+
+                    except Exception:
+                        time_now = datetime.datetime.now()
+                        print(f"Page refresh error: {time_now}")
+                        time.sleep(10)
+
+        bot.polling()

@@ -8,3 +8,4 @@ class Item(models.Model):
     is_active = models.BooleanField()
     is_testing = models.BooleanField()
     link = models.TextField()
+    image = models.ImageField()

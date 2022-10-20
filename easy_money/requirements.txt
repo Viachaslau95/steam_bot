@@ -6,9 +6,15 @@ chardet==3.0.4
 cryptography==3.2
 Django==4.1.2
 future==0.17.1
+generics==5.0.0
 idna==2.7
+Pillow==9.2.0
+postgres==4.0
+psycopg2==2.9.4
 psycopg2-binary==2.9.4
+psycopg2-pool==1.1
 pycparser==2.19
+pyTelegramBotAPI==4.7.0
 python-telegram-bot==11.1.0
 pytz==2022.4
 PyVirtualDisplay==3.0
@@ -16,4 +22,5 @@ requests==2.21.0
 selenium==3.14.1
 six==1.11.0
 sqlparse==0.4.3
+telebot==0.0.4
 urllib3==1.24
