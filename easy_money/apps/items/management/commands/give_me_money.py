@@ -15,9 +15,10 @@ options.add_argument(
 )
 options.add_extension('/home/yaroslav/projects/steam_bot/steam_bot/easy_money/chromedriver/helper.crx')
 driver = webdriver.Chrome(
-                executable_path="/home/yaroslav/projects/steam_bot/steam_bot/easy_money/chromedriver/chromedriver",
-                options=options
-        )
+    executable_path="/home/yaroslav/projects/steam_bot/steam_bot/easy_money/chromedriver/chromedriver",
+    options=options
+)
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -35,23 +36,30 @@ class Command(BaseCommand):
                                 driver.find_element_by_id('searchResultsRows').find_elements_by_class_name(
                                     'market_listing_row')[:5]
                         ):
+                            price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
                             if element.find_elements_by_class_name('sih-fraud'):
                                 driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                                bot.send_message(message.chat.id, f"You bought {item.title} with a name tag")
+                                bot.send_message(
+                                    message.chat.id,
+                                    f"You bought {item.title} with a name tag for ${price}"
+                                )
 
                         for ind, element in enumerate(driver.find_elements_by_xpath('//div[@class="sih-images"]')[:3]):
                             price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
                             count_elements = len(element.find_elements_by_class_name('sticker-image'))
-                            if count_elements == 4 and float(price) <= item.price_4 or\
+                            if count_elements == 4 and float(price) <= item.price_4 or \
                                     count_elements == 3 and float(price) <= item.price_3:
                                 driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                                bot.send_message(message.chat.id, f"You bought {item.title} with 4 or 3 stickers")
+                                bot.send_message(
+                                    message.chat.id,
+                                    f"You bought {item.title} with {count_elements} stickers for ${price}"
+                                )
                         time.sleep(5)
 
                     except Exception:
