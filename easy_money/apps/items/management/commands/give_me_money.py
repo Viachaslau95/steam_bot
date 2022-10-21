@@ -50,7 +50,7 @@ class Command(BaseCommand):
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
                                 balance = float(driver.find_elements_by_id('header_wallet_balance')[0].text[1:6])
                                 item_image = open(
-                                    f"/home/yaroslav/projects/steam_bot/steam_bot/easy_money/config/media/{item.image}",
+                                    f"{utils.abs_url}{item.image}",
                                     "rb"
                                 )
                                 bot.send_message(
