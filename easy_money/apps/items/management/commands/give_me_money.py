@@ -28,10 +28,16 @@ class Command(BaseCommand):
 
         @bot.message_handler(commands=['start'])
         def send_text_name_tag(message):
+            balance = 0
             while True:
                 for item in Item.objects.filter(is_active=True):
                     try:
                         driver.get(item.link)
+                        get_balance = float(driver.find_elements_by_id('header_wallet_balance')[0].text[1:6])
+                        if get_balance > balance:
+                            profit = get_balance - balance
+                            balance = get_balance
+                            bot.send_message(message.chat.id, f"Your balance has increased by: {profit}")
                         for ind, element in enumerate(
                                 driver.find_element_by_id('searchResultsRows').find_elements_by_class_name(
                                     'market_listing_row')[:5]
@@ -42,6 +48,11 @@ class Command(BaseCommand):
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
+                                balance = float(driver.find_elements_by_id('header_wallet_balance')[0].text[1:6])
+                                item_image = open(
+                                    f"/home/yaroslav/projects/steam_bot/steam_bot/easy_money/config/media/{item.image}",
+                                    "rb"
+                                )
                                 bot.send_message(
                                     message.chat.id,
                                     f"You've bought {item.title} with a name tag for ${price}"
@@ -61,6 +72,11 @@ class Command(BaseCommand):
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
+                                balance = float(driver.find_elements_by_id('header_wallet_balance')[0].text[1:6])
+                                item_image = open(
+                                    f"/home/yaroslav/projects/steam_bot/steam_bot/easy_money/config/media/{item.image}",
+                                    "rb"
+                                )
                                 bot.send_message(
                                     message.chat.id,
                                     f"You've bought {item.title} with {count_elements} stickers for ${price}"
