@@ -44,10 +44,15 @@ class Command(BaseCommand):
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
                                 bot.send_message(
                                     message.chat.id,
-                                    f"You bought {item.title} with a name tag for ${price}"
+                                    f"You've bought {item.title} with a name tag for ${price}"
+                                )
+                                bot.send_photo(
+                                    message.chat.id, item_image
                                 )
 
-                        for ind, element in enumerate(driver.find_elements_by_xpath('//div[@class="sih-images"]')[:3]):
+
+
+                        for ind, element in enumerate(driver.find_elements_by_xpath('//div[@class="sih-images"]')[:4]):
                             price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
                             count_elements = len(element.find_elements_by_class_name('sticker-image'))
                             if count_elements == 4 and float(price) <= item.price_4 or \
@@ -58,13 +63,16 @@ class Command(BaseCommand):
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
                                 bot.send_message(
                                     message.chat.id,
-                                    f"You bought {item.title} with {count_elements} stickers for ${price}"
+                                    f"You've bought {item.title} with {count_elements} stickers for ${price}"
+                                )
+                                bot.send_photo(
+                                    message.chat.id, item_image
                                 )
                         time.sleep(5)
 
                     except Exception:
                         time_now = datetime.datetime.now()
                         print(f"Page refresh error: {time_now}")
-                        time.sleep(10)
+                        time.sleep(20)
 
         bot.polling()
