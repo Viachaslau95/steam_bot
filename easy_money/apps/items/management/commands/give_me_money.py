@@ -37,7 +37,10 @@ class Command(BaseCommand):
                         if get_balance > balance:
                             profit = get_balance - balance
                             balance = get_balance
-                            bot.send_message(message.chat.id, f"Your balance has increased by: {profit}")
+                            bot.send_message(
+                                message.chat.id,
+                                f"Your balance has increased by: ${profit} and is now ${balance}"
+                            )
                         for ind, element in enumerate(
                                 driver.find_element_by_id('searchResultsRows').find_elements_by_class_name(
                                     'market_listing_row')[:5]
@@ -48,7 +51,7 @@ class Command(BaseCommand):
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                                balance = float(driver.find_elements_by_id('header_wallet_balance')[0].text[1:6])
+                                balance = balance - price
                                 item_image = open(
                                     f"{utils.abs_url}{item.image}",
                                     "rb"
@@ -61,18 +64,15 @@ class Command(BaseCommand):
                                     message.chat.id, item_image
                                 )
 
-
-
                         for ind, element in enumerate(driver.find_elements_by_xpath('//div[@class="sih-images"]')[:4]):
                             price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
                             count_elements = len(element.find_elements_by_class_name('sticker-image'))
-                            if count_elements == 4 and float(price) <= item.price_4 or \
-                                    count_elements == 3 and float(price) <= item.price_3:
+                            if count_elements == 4 and float(price) <= item.price_4:
                                 driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                                balance = float(driver.find_elements_by_id('header_wallet_balance')[0].text[1:6])
+                                balance = balance - price
                                 item_image = open(
                                     f"/home/yaroslav/projects/steam_bot/steam_bot/easy_money/config/media/{item.image}",
                                     "rb"
@@ -84,7 +84,7 @@ class Command(BaseCommand):
                                 bot.send_photo(
                                     message.chat.id, item_image
                                 )
-                        time.sleep(5)
+                        time.sleep(10)
 
                     except Exception:
                         time_now = datetime.datetime.now()
