@@ -33,13 +33,13 @@ class Command(BaseCommand):
                 for item in Item.objects.filter(is_active=True):
                     try:
                         driver.get(item.link)
-                        get_balance = float(driver.find_elements_by_id('header_wallet_balance')[0].text[1:6])
+                        get_balance = float(driver.find_elements_by_id('marketWalletBalanceAmount')[0].text[1:])
                         if get_balance > balance:
                             profit = get_balance - balance
                             balance = get_balance
                             bot.send_message(
                                 message.chat.id,
-                                f"Your balance has increased by: ${profit} and is now ${balance}"
+                                f"Your balance has increased by: ${round(profit, 2)} and is now ${balance}"
                             )
                         for ind, element in enumerate(
                                 driver.find_element_by_id('searchResultsRows').find_elements_by_class_name(
@@ -51,7 +51,7 @@ class Command(BaseCommand):
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                                balance = balance - price
+                                balance = balance - float(price)
                                 item_image = open(
                                     f"{utils.abs_url}{item.image}",
                                     "rb"
@@ -72,7 +72,7 @@ class Command(BaseCommand):
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                                balance = balance - price
+                                balance = balance - float(price)
                                 item_image = open(
                                     f"/home/yaroslav/projects/steam_bot/steam_bot/easy_money/config/media/{item.image}",
                                     "rb"
@@ -84,11 +84,11 @@ class Command(BaseCommand):
                                 bot.send_photo(
                                     message.chat.id, item_image
                                 )
-                        time.sleep(10)
+                        time.sleep(5)
 
                     except Exception:
                         time_now = datetime.datetime.now()
                         print(f"Page refresh error: {time_now}")
-                        time.sleep(20)
+                        time.sleep(10)
 
         bot.polling()
