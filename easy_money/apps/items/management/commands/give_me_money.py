@@ -46,7 +46,7 @@ class Command(BaseCommand):
                                     'market_listing_row')[:5]
                         ):
                             price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
-                            if element.find_elements_by_class_name('sih-fraud'):
+                            if element.find_elements_by_class_name('sih-fraud') and float(price) <= item.price_for_name_tag:
                                 driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
                                 print('try buy')
                                 driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
@@ -63,28 +63,29 @@ class Command(BaseCommand):
                                 bot.send_photo(
                                     message.chat.id, item_image
                                 )
-
-                        for ind, element in enumerate(driver.find_elements_by_xpath('//div[@class="sih-images"]')[:4]):
-                            price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
-                            count_elements = len(element.find_elements_by_class_name('sticker-image'))
-                            if count_elements == 4 and float(price) <= item.price_4:
-                                driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
-                                print('try buy')
-                                driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
-                                driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
-                                balance = balance - float(price)
-                                item_image = open(
-                                    f"/home/yaroslav/projects/steam_bot/steam_bot/easy_money/config/media/{item.image}",
-                                    "rb"
-                                )
-                                bot.send_message(
-                                    message.chat.id,
-                                    f"You've bought {item.title} with {count_elements} stickers for ${price}"
-                                )
-                                bot.send_photo(
-                                    message.chat.id, item_image
-                                )
-                        time.sleep(5)
+                        time.sleep(2)
+                        if item.price_4:
+                            for ind, element in enumerate(driver.find_elements_by_xpath('//div[@class="sih-images"]')[:4]):
+                                price = driver.find_elements_by_class_name('market_listing_their_price')[ind].text[1:5]
+                                count_elements = len(element.find_elements_by_class_name('sticker-image'))
+                                if count_elements == 4 and float(price) <= item.price_4:
+                                    driver.find_elements_by_class_name('market_listing_buy_button')[ind].click()
+                                    print('try buy')
+                                    driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_accept_ssa"]')[0].click()
+                                    driver.find_elements_by_xpath('//*[@id="market_buynow_dialog_purchase"]')[0].click()
+                                    balance = balance - float(price)
+                                    item_image = open(
+                                        f"/home/yaroslav/projects/steam_bot/steam_bot/easy_money/config/media/{item.image}",
+                                        "rb"
+                                    )
+                                    bot.send_message(
+                                        message.chat.id,
+                                        f"You've bought {item.title} with {count_elements} stickers for ${price}"
+                                    )
+                                    bot.send_photo(
+                                        message.chat.id, item_image
+                                    )
+                            time.sleep(3)
 
                     except Exception:
                         time_now = datetime.datetime.now()
