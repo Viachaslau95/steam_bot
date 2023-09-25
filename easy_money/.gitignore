@@ -131,4 +131,5 @@ config.py
 .idea
 config/media
 apps/items/utils.py
+config/settings/local.py
 
